@@ -1,98 +1,66 @@
 import random
-print("Hello world")
+import threading
+import time
 
-class Priority:
+shared_resource = dict.fromkeys(range(1, 21), 0)
+# 20 properties and the value of each property is initialized to zero
+print(shared_resource)
 
-    def processData(self, no_of_processes):
-        process_data = []
-        for i in range(no_of_processes):
-            temporary = []
-            process_id = int(input("Enter Process ID: "))
-            arrival_time = random.randint(0, 29)
-            burst_time = random.randint(1, 5)
+print("Hello ")
+def executeProcess():
+    pass
 
-            priority = int(input(f"Enter Priority for Process {process_id}: "))
+def addRecord():
+    resource_record_id = random.randint(1, 20)
+    resource_record_value = random.randint(1, 100)
+    shared_resource[resource_record_id] = resource_record_value
+    # assigning necessary values
+def deleteRecord():
+    resource_record_id = random.randint(1, 20)
+    shared_resource[resource_record_id] = 0
 
+def retrieveRecord():
+    resource_record_id = random.randint(1, 20)
+    print(shared_resource[resource_record_id])
 
-            temporary.extend([process_id, arrival_time,burst_time, priority])
-            '''
-            putting all those in temporary 
-            '''
-            process_data.append(temporary)
-        Priority.schedulingProcess(self, process_data)
-
-        '''
-        self refers to instance of the class
-        '''
-
-    def schedulingProcess(self, process_data):
-        process_data.sort(key=lambda x: x[3], reverse=True)
-        '''
-        Sort according to Priority considering Higher the Value, Higher the Priority
-        '''
-        start_time = []
-        exit_time = []
-        s_time = 0
-        for i in range(len(process_data)):
-            start_time.append(s_time)
-            s_time = s_time + process_data[i][2]
-            e_time = s_time
-            exit_time.append(e_time)
-            process_data[i].append(e_time)
-        t_time = Priority.calculateTurnaroundTime(self, process_data)
-        b_time = Priority.calculateBlocked(self, process_data)
-        Priority.printData(self, process_data, b_time)
-
-    def calculateTurnaroundTime(self, process_data):
-        total_turnaround_time = 0
-        for i in range(len(process_data)):
-            turnaround_time = process_data[i][4] - process_data[i][1]
-            '''
-            turnaround_time = completion_time - arrival_time
-            '''
-            total_turnaround_time = total_turnaround_time + turnaround_time
-            process_data[i].append(turnaround_time)
-        average_turnaround_time = total_turnaround_time / len(process_data)
-        '''
-        average_turnaround_time = total_turnaround_time / no_of_processes
-        '''
-        return average_turnaround_time
+def dataTotal():
+    print(sum(shared_resource.values()))
 
 
-    def calculateBlocked(self, process_data):
-        total_blocked_time = 0
-        for i in range(len(process_data)):
-            blocked_time = process_data[i][5] - process_data[i][2]
-            '''
-             blocked is turnaround - burst 
-            '''
-            total_blocked_time = total_blocked_time + blocked_time
-            process_data[i].append(blocked_time)
-        average_blocked_time = total_blocked_time / len(process_data)
-        '''
-        average_blocked_time = total_blocked_time / no_of_processes
-        '''
-        return average_blocked_time
+def main():
+    # shared resource list
 
+    process_threads = list()
+    for x in range(20):
+        task_selector = random.randint(1, 4)
+        # thread creation
+        process_thread: threading.Thread
+        if task_selector == 1:
+            print("Thread is doing the task add record")
+            # task 1 is to add a record
+            process_thread = threading.Thread(target=addRecord)
 
-    def printData(self, process_data,average_blocked_time):
-        process_data.sort(key=lambda x: x[0])
-        '''
-        Sort according to the Process ID
-        '''
-        print("Process_ID  Arrival_Time  Burst_Time       Priority     Completion_Time      Blocked_Time")
+        elif task_selector == 2:
+            print("Thread is doing the task delete record")
+            # task 2 is to delete a record
+            process_thread = threading.Thread(target=deleteRecord)
 
-        for i in range(len(process_data)):
-            for j in range(len(process_data[i])):
-                print(process_data[i][j], end="\t\t\t\t")
-            print()
+        elif task_selector == 3:
+            print("Thread is doing the task retrieve record")
+            # task 3 is retrieve a record
+            process_thread = threading.Thread(target=retrieveRecord)
 
+        else:
+            print("Thread is doing the task calculate record data total")
+            # task 4 is calculate record data total
+            process_thread = threading.Thread(target=dataTotal)
+        process_threads.append(process_thread)
+        # adding the new thread to the thread pool process threads
+        process_thread.start()
 
-
-        #print(f'Average Blocked Time: {average_blocked_time}')
-
-
+    for thread in process_threads:
+        thread.join()
+        # every thread will finish execution before continuing
+    print(shared_resource)
 if __name__ == "__main__":
-    no_of_processes = random.randint(1,4)
-    priority = Priority()
-    priority.processData(no_of_processes)
+    main()
