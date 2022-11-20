@@ -16,14 +16,14 @@ class Priority:
 
             temporary.extend([process_id, arrival_time,burst_time, priority])
             '''
-            random generates arrival time 
+            putting all those in temporary 
             '''
             process_data.append(temporary)
         Priority.schedulingProcess(self, process_data)
 
         '''
-            self refers to instance of the class
-            '''
+        self refers to instance of the class
+        '''
 
     def schedulingProcess(self, process_data):
         process_data.sort(key=lambda x: x[3], reverse=True)
@@ -39,35 +39,48 @@ class Priority:
             e_time = s_time
             exit_time.append(e_time)
             process_data[i].append(e_time)
+        t_time = Priority.calculateTurnaroundTime(self, process_data)
+        b_time = Priority.calculateBlocked(self, process_data)
+        Priority.printData(self, process_data, b_time)
 
-        w_time = Priority.calculateWaitingTime(self, process_data)
-        Priority.printData(self, process_data, w_time)
-
-
-
-
-    def calculateWaitingTime(self, process_data):
-        total_waiting_time = 0
+    def calculateTurnaroundTime(self, process_data):
+        total_turnaround_time = 0
         for i in range(len(process_data)):
-            waiting_time = process_data[i][5] - process_data[i][2]
+            turnaround_time = process_data[i][4] - process_data[i][1]
             '''
-            waiting_time = turnaround_time - burst_time
+            turnaround_time = completion_time - arrival_time
             '''
-            total_waiting_time = total_waiting_time + waiting_time
-            process_data[i].append(waiting_time)
-        average_waiting_time = total_waiting_time / len(process_data)
+            total_turnaround_time = total_turnaround_time + turnaround_time
+            process_data[i].append(turnaround_time)
+        average_turnaround_time = total_turnaround_time / len(process_data)
         '''
-        average_waiting_time = total_waiting_time / no_of_processes
+        average_turnaround_time = total_turnaround_time / no_of_processes
         '''
-        return average_waiting_time
+        return average_turnaround_time
 
 
-    def printData(self, process_data,average_waiting_time):
+    def calculateBlocked(self, process_data):
+        total_blocked_time = 0
+        for i in range(len(process_data)):
+            blocked_time = process_data[i][5] - process_data[i][2]
+            '''
+             blocked is turnaround - burst 
+            '''
+            total_blocked_time = total_blocked_time + blocked_time
+            process_data[i].append(blocked_time)
+        average_blocked_time = total_blocked_time / len(process_data)
+        '''
+        average_blocked_time = total_blocked_time / no_of_processes
+        '''
+        return average_blocked_time
+
+
+    def printData(self, process_data,average_blocked_time):
         process_data.sort(key=lambda x: x[0])
         '''
         Sort according to the Process ID
         '''
-        print("Process_ID  Arrival_Time  Burst_Time       Priority  Completion_Time    Waiting_Time")
+        print("Process_ID  Arrival_Time  Burst_Time       Priority     Completion_Time      Blocked_Time")
 
         for i in range(len(process_data)):
             for j in range(len(process_data[i])):
@@ -76,7 +89,7 @@ class Priority:
 
 
 
-        print(f'Average Waiting Time: {average_waiting_time}')
+        #print(f'Average Blocked Time: {average_blocked_time}')
 
 
 if __name__ == "__main__":
